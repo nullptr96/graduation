@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gxj.graduation.dao.UserDao">
+    <resultMap type="User" id="userResultMap" >
+        <id property="id" column="id"/>
+        <result property="password" column="password"/>
+        <result property="priority" column="priority"/>
+    </resultMap>
+
+    <insert id="addUser" parameterType="User">
+        INSERT INTO user(id,password,priority) VALUE (#{id},#{password}, #{priority})
+    </insert>
+
+    <select id="queryById" resultType="user" parameterType="String">
+        SELECT id,password,priority
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <select id="queryAllUser" resultMap="userResultMap">
+        SELECT id,password,priority
+        FROM user
+    </select>
+
+</mapper>
