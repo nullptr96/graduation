@@ -7,6 +7,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -26,7 +31,7 @@ public class UserController {
     }
 
     @RequestMapping("/login")
-    public String login(Model model,User user){
+    public String login(Model model,User user, HttpServletResponse response) throws UnsupportedEncodingException {
         User userById = userService.queryById(user.getId());
         if(userById != null){
             System.out.println("查询："+userById.getId());
@@ -34,8 +39,13 @@ public class UserController {
             System.out.println("输入："+user.getId());
             System.out.println("输入："+user.getPassword());
             if(userById.getPassword().equals(user.getPassword())){
+                //将用户名存入cookie 并且设置cookie存在时长
+                Cookie cookie_userId = new Cookie("userId", URLEncoder.encode(user.getId(),"utf-8"));
+                cookie_userId.setMaxAge(60*60*60);
+                response.addCookie(cookie_userId);
+
                 System.out.println("success");
-                return "success";
+                return "businessFlowChart";
             }
             System.out.println("failure");
         }
