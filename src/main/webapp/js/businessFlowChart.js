@@ -559,8 +559,8 @@ function saveBF(){
 
 function generateWSF(){
     var params = {};
-    params.nodeDataArray = _designer.model.nodeDataArray;
-    params.linkDataArray = _designer.model.linkDataArray;//注意params.名称  名称与实体bean中名称一致
+    params.nodeDataArray = JSON.stringify(_designer.model.nodeDataArray);
+    params.linkDataArray = JSON.stringify(_designer.model.linkDataArray);//注意params.名称  名称与实体bean中名称一致
     $.ajax({
         type: "POST",
         url: "../bussinessFlow/generateWSF",

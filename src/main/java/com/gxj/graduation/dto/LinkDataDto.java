@@ -1,6 +1,6 @@
-package com.gxj.graduation.entity;
+package com.gxj.graduation.dto;
 
-public class LinkData {
+public class LinkDataDto {
     private String from;
     private String to;
     private String fromPort;

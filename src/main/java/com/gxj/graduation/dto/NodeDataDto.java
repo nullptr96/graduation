@@ -1,6 +1,6 @@
-package com.gxj.graduation.entity;
+package com.gxj.graduation.dto;
 
-public class NodeData {
+public class NodeDataDto {
     private String type;
     private String category;
     private String text;
