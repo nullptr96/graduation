@@ -30,7 +30,7 @@
         where WSid = #{WSid}
     </select>
 
-    <select id="queryParamsByFid"  resultType="com.gxj.graduation.dto.WSFunctionDto">
+    <select id="queryParamsByFid"  resultType="com.gxj.graduation.entity.WSParam">
         SELECT id,name,description,type,mode,Fid
         FROM wsparams
         where Fid = #{Fid} and mode = #{mode}

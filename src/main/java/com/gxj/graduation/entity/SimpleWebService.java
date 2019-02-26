@@ -9,6 +9,15 @@ public class SimpleWebService {
     private String description;
     private String Uid;
 
+    public SimpleWebService() {
+        this.name = "";
+        this.asmxUrl = "";
+        this.discoUrl = "";
+        this.wsdlUrl = "";
+        this.description = "";
+        this.Uid = "";
+    }
+
     public int getId() {
         return id;
     }

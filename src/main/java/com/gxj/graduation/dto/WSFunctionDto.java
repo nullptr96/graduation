@@ -1,30 +1,38 @@
 package com.gxj.graduation.dto;
 
-import com.gxj.graduation.entity.WSParams;
+import com.gxj.graduation.entity.WSParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WSFunctionDto {
     private int id;
     private String name;
     private String description;
-    private String WSid;
-    private List<WSParams> inputParams;
-    private List<WSParams> outputParams;
+    private int WSid;
+    private List<WSParam> inputParams;
+    private List<WSParam> outputParams;
 
-    public List<WSParams> getInputParams() {
+    public WSFunctionDto() {
+        this.name = "";
+        this.description = "";
+        this.inputParams = new ArrayList<>();
+        this.outputParams = new ArrayList<>();
+    }
+
+    public List<WSParam> getInputParams() {
         return inputParams;
     }
 
-    public void setInputParams(List<WSParams> inputParams) {
+    public void setInputParams(List<WSParam> inputParams) {
         this.inputParams = inputParams;
     }
 
-    public List<WSParams> getOutputParams() {
+    public List<WSParam> getOutputParams() {
         return outputParams;
     }
 
-    public void setOutputParams(List<WSParams> outputParams) {
+    public void setOutputParams(List<WSParam> outputParams) {
         this.outputParams = outputParams;
     }
 
@@ -62,11 +70,11 @@ public class WSFunctionDto {
         this.description = description;
     }
 
-    public String getWSid() {
+    public int getWSid() {
         return WSid;
     }
 
-    public void setWSid(String WSid) {
+    public void setWSid(int WSid) {
         this.WSid = WSid;
     }
 

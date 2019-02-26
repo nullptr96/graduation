@@ -2,6 +2,7 @@ package com.gxj.graduation.dto;
 
 import com.gxj.graduation.entity.WSFunction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WebServiceDto {
@@ -14,6 +15,16 @@ public class WebServiceDto {
     private String Uid;
     private List<WSFunction> functions;
     private double similarity;
+
+    public WebServiceDto() {
+        this.name = "";
+        this.asmxUrl = "";
+        this.discoUrl = "";
+        this.wsdlUrl = "";
+        this.description = "";
+        this.Uid = "";
+        this.functions = new ArrayList<>();
+    }
 
     public double getSimilarity() {
         return similarity;

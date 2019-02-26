@@ -4,7 +4,12 @@ public class WSFunction {
     private int id;
     private String name;
     private String description;
-    private String WSid;
+    private int WSid;
+
+    public WSFunction() {
+        this.name = "";
+        this.description = "";
+    }
 
     public int getId() {
         return id;
@@ -30,11 +35,11 @@ public class WSFunction {
         this.description = description;
     }
 
-    public String getWSid() {
+    public int getWSid() {
         return WSid;
     }
 
-    public void setWSid(String WSid) {
+    public void setWSid(int WSid) {
         this.WSid = WSid;
     }
 }

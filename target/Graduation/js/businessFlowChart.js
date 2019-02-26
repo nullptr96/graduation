@@ -12,19 +12,52 @@ var userId = getCookie('userId');
 if(userId == null){
     //todo: logout
 }
+var nodeDataArray = localStorage.WSNodes;
+var LinkDataArray = localStorage.WSLinks;
 var flowdata={ "class": "go.GraphLinksModel",
     "linkFromPortIdProperty": "fromPort",
     "linkToPortIdProperty": "toPort",
-    "nodeDataArray": [
-        // {"category":"Comment", "loc":"360 -10", "text":"comment", "key":-13},
-        // {"key":-1, "category":"Start", "loc":"175 0", "text":"Start"},
-        // {"key":0, "loc":"0 0", "text":"node1"},
-        // {"key":1, "loc":"175 100", "text":"node2","input":"周一","output":"火车"},
-        // {"key":-2, "category":"End", "loc":"175 640", "text":"End!"}
-    ],
+    "nodeDataArray":
+        [{"type":"operation","category":null,"text":"查询明天天气","key":"-2","loc":"-477 -235","figure":null},
+            {"type":"operation","category":"Stress","text":"查询火车票","key":"-3","loc":"-563 -81","figure":null,},
+            {"type":"condition","category":null,"text":"如果下雨","key":"-4","loc":"-496 -148","figure":"Diamond",
+                // "similarServices":[
+                //     {"wsid":1,"wsName":"2500多个城市天气预报 WEB服务","wsAsmx":null,"funcName":"getWeather","funcId":1,"funcDesc":"获得天气预报数据","inputParam":[{"type":"String","name":"theCityCode"},{"type":"String","name":"theUserID"}],"outputParam":[{"type":"ArrayOfString","name":"getWeatherResult"}]},
+                //     {"wsid":2,"wsName":"400个国内外主要城市天气预报Web服务","wsAsmx":null,"funcName":"getSupportProvince","funcId":2,"funcDesc":"获得本天气预报Web Services支持的洲、国内外省份和城市信息\r\n","inputParam":[],"outputParam":[{"type":"ArrayOfString","name":"getSupportProvinceResult"}]},
+                //     {"wsid":2,"wsName":"400个国内外主要城市天气预报Web服务","wsAsmx":null,"funcName":"getWeatherbyCityName","funcId":2,"funcDesc":"根据城市或地区名称查询获得未来三天内天气情况、现在的天气实况、天气和生活指数\r\n根据城市或地区名称查询获得未来三天内天气情况、现在的天气实况、天气和生活指数\r\n","inputParam":[{"type":"String","name":"theCityName"}],"outputParam":[{"type":"ArrayOfString","name":"getWeatherbyCityNameResult"}]},
+                //     {"wsid":1,"wsName":"2500多个城市天气预报 WEB服务","wsAsmx":null,"funcName":"getRegionCountry","funcId":1,"funcDesc":"获得国外国家名称和与之对应的ID","inputParam":[],"outputParam":[{"type":"ArrayOfString","name":"getRegionCountryResult"}]},
+                //     {"wsid":2,"wsName":"400个国内外主要城市天气预报Web服务","wsAsmx":null,"funcName":"getSupportCity","funcId":2,"funcDesc":"查询本天气预报Web Services支持的国内外城市或地区信息\r\n查询本天气预报Web Services支持的国内外城市或地区信息\r\n","inputParam":[{"type":"ArrayOfString","name":"byProvinceName"}],"outputParam":[{"type":"ArrayOfString","name":"getSupportCityResult"}]}
+                //     ]
+            }],
+    //     [
+    //     {"category":"Comment", "loc":"360 -10", "text":"comment", "key":-13},
+    //     {"key":-1, "category":"Start", "loc":"175 0", "text":"Start"},
+    //     {"key":0, "loc":"0 0", "text":"node1"},
+    //     {"key":1, "loc":"175 100", "text":"node2","input":"周一","output":"火车"},
+    //     {"key":2, "loc":"175 190", "text":"node3"},
+    //     {"key":3, "loc":"175 270", "text":"node4"},
+    //     {"key":4, "loc":"175 370", "text":"node5"},
+    //     {"key":5, "loc":"352 85", "text":"node6"},
+    //     {"key":6, "loc":"175 440", "text":"node7"},
+    //     {"key":7, "loc":"175 500", "text":"node8"},
+    //     {"key":8, "loc":"175 570", "text":"node9"},
+    //     {"key":-2, "category":"End", "loc":"175 640", "text":"End!"}
+    // ],
     "linkDataArray": [
-        // {"from":1, "to":2, "fromPort":"B", "toPort":"T"}
-    ]};
+        {"from":-2, "to":-4, "fromPort":"B", "toPort":"T"},
+        {"from":-4, "to":-3, "fromPort":"B", "toPort":"T"},
+        // {"from":3, "to":4, "fromPort":"B", "toPort":"T"},
+        // {"from":4, "to":6, "fromPort":"B", "toPort":"T"},
+        // {"from":6, "to":7, "fromPort":"B", "toPort":"T"},
+        // {"from":7, "to":8, "fromPort":"B", "toPort":"T"},
+        // {"from":8, "to":-2, "fromPort":"B", "toPort":"T"},
+        // {"from":-1, "to":0, "fromPort":"B", "toPort":"T"},
+        // {"from":-1, "to":1, "fromPort":"B", "toPort":"T"},
+        // {"from":-1, "to":5, "fromPort":"B", "toPort":"T"},
+        // {"from":5, "to":4, "fromPort":"B", "toPort":"T"},
+        // {"from":0, "to":4, "fromPort":"B", "toPort":"T"}
+    ]
+};
 var choosedNodeData;
 var _designer = {};
 function FlowDesigner(diagramDiv) {
@@ -519,9 +552,9 @@ $(function(){
     $('#diagramdiv').height($(window).height()-60);
     var areaFlow = $('#savedmodel').get(0);
     var  myDesigner= new FlowDesigner('diagramdiv');
-    myDesigner.initToolbar('palettediv'); // ��ʼ���ؼ����
-    // myDesigner.displayFlow(areaFlow.value); // ������������ʾ����ͼ
-    myDesigner.displayFlow(flowdata); // ������������ʾ����ͼ
+    myDesigner.initToolbar('palettediv');
+    // myDesigner.displayFlow(areaFlow.value);
+    myDesigner.displayFlow(JSON.stringify(flowdata).replace(/null/g,"\"\""));
 });
 
 function saveNode(){
@@ -561,18 +594,27 @@ function generateWSF(){
     var params = {};
     params.nodeDataArray = JSON.stringify(_designer.model.nodeDataArray);
     params.linkDataArray = JSON.stringify(_designer.model.linkDataArray);//注意params.名称  名称与实体bean中名称一致
+    var newWin = window.open("../views/loadingPage.html");
     $.ajax({
         type: "POST",
         url: "../bussinessFlow/generateWSF",
         data:params,
         dataType:"json",
+        // async:false,
 //	         		   contentType: "application/json; charset=utf-8",//此处不能设置，否则后台无法接值
         success:function(data){
-            if(data === true){
-                alert( "生成成功" );
+            if(data.length !== 0){
+                localStorage.setItem("WSNodes",JSON.stringify(data));
+                localStorage.setItem("WSLinks",params.linkDataArray);
+                newWin.location = "../views/combinedWSFlowChart.jsp";
+            }
+            else{
+                newWin.close();
+                alert("无流程图数据");
             }
         },
         error:function(data){
+            newWin.close();
             alert("出现异常，异常原因【" + data + "】!");
         }
     });

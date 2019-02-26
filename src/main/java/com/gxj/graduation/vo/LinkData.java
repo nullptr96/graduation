@@ -6,6 +6,7 @@ public class LinkData {
     private String fromPort;
     private String toPort;
 
+
     public String getFrom() {
         return from;
     }
