@@ -56,8 +56,8 @@
         <div style="flex-grow: 1; border: solid 1px #cbcccc">
             <div id="top-toolbar" style="flex-grow: 1; height: 50px; border: solid 1px #cbcccc">
                 <span style="display:inline-block;vertical-align: middle; height :100%"></span>
-                <input type="button" class = 'top-toobar-btn' value="保存业务流程" onclick="saveBF()">
-                <input type="button" class = 'top-toobar-btn' value="生成web服务流程" onclick="generateWSF()">
+                <input type="button" class = 'top-toobar-btn' value="保存组合服务流程" onclick="saveBF()">
+                <input type="button" class = 'top-toobar-btn' value="调用组合服务流程" onclick="callWSF()">
                 <ul class="nav">
                     <li class="drop-down"><a href="#">退出</a></li>
                     <li class="drop-down"><a id='userId' href="#">未登陆</a>
@@ -71,21 +71,8 @@
                 <div id="diagramdiv" style="flex-grow: 1; height: 620px; border: solid 1px #cbcccc"></div>
                 <div style="width: 360px; margin-right: 2px; background-color: whitesmoke; border: solid 1px #cbcccc">
                     <%--<div id="palettediv" style="width: 180px; height:360px; margin-right: 2px; background-color: whitesmoke; border: solid 1px #cbcccc"></div>--%>
-                    <div id="attributeDiv" style="float:right; width:360px ; height: 620px;background-color: whitesmoke; border: solid 1px #cbcccc">
+                    <div id="attributeDiv" style="float:right; width:360px ;background-color: whitesmoke; border: solid 1px #cbcccc">
                         <div id = "attributePanelDiv"></div>
-                        <%--<form action="" name="nodeAttribute">--%>
-                            <%--<p>属性面板</p>--%>
-                            <%--业务流程描述：<input type="text" class="nodeAttribute-desc" id="nodeAttribute-desc" placeholder=""><br>--%>
-                            <%--服务id：<input type="text" class="nodeAttribute-inline" id="nodeAttribute-wsid" placeholder=""><br>--%>
-                            <%--服务中文名：<input type="text" class="nodeAttribute-inline" id="nodeAttribute-wsName" placeholder=""><br>--%>
-                            <%--&lt;%&ndash;服务方法：<input type="text" class="nodeAttribute-inline" id="nodeAttribute-wsfunction" placeholder=""><br>&ndash;%&gt;--%>
-                            <%--&lt;%&ndash;&lt;%&ndash;业务流程描述：<input type="text" class="nodeAttribute-desc" id="nodeAttribute-desc" placeholder=""><br>&ndash;%&gt;&ndash;%&gt;--%>
-                            <%--&lt;%&ndash;服务id：<input type="text" class="nodeAttribute-inline" id="nodeAttribute-wsid" placeholder=""><br>&ndash;%&gt;--%>
-                            <%--&lt;%&ndash;服务中文名：<input type="text" class="nodeAttribute-inline" id="nodeAttribute-wsName" placeholder=""><br>&ndash;%&gt;--%>
-                            <%--服务方法：<div id="nodeAttribute-wsfunction" style="display:inline-block"></div><br>--%>
-                            <%--输入参数：<div id = "inputParamsDiv"></div><br>--%>
-                            <%--输出参数：<div id = "outputParamsDiv"></div><br>--%>
-                        <%--</form>--%>
                     </div>
                     <div id="toolbar" style="float:left; width:360px ; height: 30px; text-align:center;">
                         <input type="button" value="保存" onclick="saveNode()">

@@ -21,19 +21,30 @@ Build date: 2013-04-03 15:07:25
 Ext.onReady(function(){
     Ext.QuickTips.init();
 
-    var comboData= [['类型1', '0'], ['类型2', '1']];
+    var comboData= [];
     var _getWSFunctionCombox = function ( id, comboData) {
         var combStore =  new Ext.data.SimpleStore({
-            fields : ['showText', 'value'],
+            fields : ['funcName', 'similarServiceIndex'],
         });
         var comb = new Ext.form.ComboBox({
             id:id,
             mode : 'local',//本地数据
             store : combStore,
             width : "100%",
-            displayField : 'showText',
-            valueField : 'value',
+            displayField : 'funcName',
+            valueField : 'similarServiceIndex',
             fieldLabel : '服务方法',
+            listeners: {
+                select: function(){
+                    var index = Ext.getCmp('WSFunctionComb').getValue();
+                    if(choosedNodeData.similarServices != null && choosedNodeData.similarServices[index] !=null) {
+                        Ext.getCmp('attributePanel')._setNodeAttriubtebySelectedService(choosedNodeData.similarServices[index]);
+                    }
+                },
+                change: function(){
+
+                }
+            },
             _loadStore : function (comboData) {
                 this.store.loadData(comboData)
             }
@@ -50,15 +61,9 @@ Ext.onReady(function(){
 
 
     var inputParamsData = [
-        ['param1','string', 'a'],
-        ['param2','string', 'b'],
-        ['param3','string', 'c'],
     ];
 
     var outputParamsData = [
-        ['param4','string', 'a'],
-        ['param5','string', 'b'],
-        ['param6','string', 'c'],
     ];
 
 
@@ -161,18 +166,28 @@ Ext.onReady(function(){
                 new _getParamsGrid('inputParamsGrid', '输入参数',inputParamsData),
                 new _getParamsGrid('outputParamsGrid','输出参数',outputParamsData)
             ],
-            // renderTo:'attributeDiv'
+            _setNodeAttriubtebySelectedService : function(selectedService){
+            Ext.getCmp('WSid').setValue(selectedService.wsid);
+            Ext.getCmp('WSName').setValue(selectedService.wsName);
+            Ext.getCmp('inputParamsGrid')._loadStore(_getParamGridStoreDataFromObjectArray(selectedService.inputParam));
+            Ext.getCmp('outputParamsGrid')._loadStore(_getParamGridStoreDataFromObjectArray(selectedService.outputParam));
+
+        }
         })
         panel.render('attributePanelDiv');
-        this._getAttributePanel = function(){
-            return Ext.getCmp(id);
-        }
         return panel;
     }
 
     new _getAttributePanel();
 });
 
+function _getParamGridStoreDataFromObjectArray( params){
+    var storeData = [];
+    params.forEach(function(v){
+        storeData.push([v.name,v.type,v.value])
+    })
+    return storeData;
+}
 
 // /**
 //  * Custom function used for column renderer

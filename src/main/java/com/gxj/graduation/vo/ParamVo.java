@@ -3,10 +3,20 @@ package com.gxj.graduation.vo;
 public class ParamVo{
     private String type;
     private String name;
+    private String value;
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 
     public ParamVo() {
         this.type = "";
         this.name = "";
+        this.value = "";
     }
 
     public String getType() {

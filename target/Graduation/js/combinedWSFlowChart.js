@@ -129,11 +129,11 @@ function FlowDesigner(diagramDiv) {
                 if (e.modelChange !== "nodeDataArray") return;
                 // record node insertions and removals
                 if (e.change === go.ChangedEvent.Insert) {
-                    alert('new node');
+                    // alert('new node');
                     e.getValue().input ='';//给节点添加输入参数属性
                     e.getValue().output='';//给节点添加输出参数属性
                 } else if (e.change === go.ChangedEvent.Remove) {
-                    alert('delete node');
+                    // alert('delete node');
                 }
             });
         });
@@ -445,27 +445,42 @@ function FlowDesigner(diagramDiv) {
     };
 
     function onObjectSingleClicked(ev){
-        alert(" Single clicked");
+        // alert(" Single clicked");
         var part = ev.subject.part;
         choosedNodeData = ev.subject.part.data;
+        var combStoreData =[];
         Ext.getCmp('flowDesc').setValue(choosedNodeData.text);
-        _setNodeAttriubtebySelectedService(choosedNodeData.selectedService);
+        if(choosedNodeData.similarServices != null) {
+            choosedNodeData.similarServices.forEach(function (v, index) {
+                combStoreData.push([v.funcName, index])
+            })
+            Ext.getCmp('WSFunctionComb')._loadStore(combStoreData);
+            Ext.getCmp('WSFunctionComb').setValue(0);
+        }
+        if(choosedNodeData.selectedService !=null) {
+            Ext.getCmp('attributePanel')._setNodeAttriubtebySelectedService(choosedNodeData.selectedService);
+        }
     }
-    function _setNodeAttriubtebySelectedService(selectedService){
-        Ext.getCmp('WSid').setValue(selectedService.wsid);
-        Ext.getCmp('WSName').setValue(selectedService.wsName);
-        Ext.getCmp('WSFunctionComb').setValue(selectedService.funcName);
-        Ext.getCmp('inputParamsGrid')._loadStore(_getParamGridStoreDataFromObjectArray(selectedService.inputParam));
-        Ext.getCmp('outputParamsGrid')._loadStore(_getParamGridStoreDataFromObjectArray(selectedService.outputParam));
-
-    }
-    function _getParamGridStoreDataFromObjectArray( params){
-        var storeData = [];
-        params.forEach(function(v){
-            storeData.push([v.name,v.type,""])
-        })
-        return storeData
-    }
+    // Ext.getCmp('WSFunctionComb').on('select',function() {
+    //     if(choosedNodeData.similarService != null && choosedNodeData.similarService[index] !=null) {
+    //         var index = Ext.getCmp('WSFunctionComb').getValue();
+    //         _setNodeAttriubtebySelectedService(choosedNodeData.similarService[index]);
+    //     }
+    // });
+    // function _setNodeAttriubtebySelectedService(selectedService){
+    //     Ext.getCmp('WSid').setValue(selectedService.wsid);
+    //     Ext.getCmp('WSName').setValue(selectedService.wsName);
+    //     Ext.getCmp('inputParamsGrid')._loadStore(_getParamGridStoreDataFromObjectArray(selectedService.inputParam));
+    //     Ext.getCmp('outputParamsGrid')._loadStore(_getParamGridStoreDataFromObjectArray(selectedService.outputParam));
+    //
+    // }
+    // function _getParamGridStoreDataFromObjectArray( params){
+    //     var storeData = [];
+    //     params.forEach(function(v){
+    //         storeData.push([v.name,v.type,""])
+    //     })
+    //     return storeData;
+    // }
     function onObjectContextClicked(ev){
         // alert(" context clicked");
         var part = ev.subject.part;
@@ -533,9 +548,34 @@ $(function(){
 });
 
 function saveNode(){
-    choosedNodeData.input = document.getElementById('nodeAttribute-input').value;
-    choosedNodeData.output = document.getElementById('nodeAttribute-output').value;
-    choosedNodeData.text = document.getElementById('nodeAttribute-desc').value;
+    choosedNodeData.text = Ext.getCmp('flowDesc').getValue();
+    choosedNodeData.selectedService ={};
+    var index =Ext.getCmp('WSFunctionComb').getValue();
+    if(choosedNodeData.similarServices !=null && choosedNodeData.similarServices[index]!=null) {
+        choosedNodeData.selectedService = choosedNodeData.similarServices[index];
+        choosedNodeData.selectedService.inputParam = [];
+        choosedNodeData.selectedService.outputParam = [];
+    }
+    else{
+        choosedNodeData.selectedService.wsid = parseInt(Ext.getCmp('WSid').getValue());
+        choosedNodeData.selectedService.wsName = Ext.getCmp('WSName').getValue();
+        choosedNodeData.selectedService.wsAsmx = '';
+        choosedNodeData.selectedService.funcName = Ext.getCmp('WSName').getValue();
+        choosedNodeData.selectedService.funcDesc = '';
+        choosedNodeData.selectedService.funcid = null;
+        choosedNodeData.selectedService.inputParam = [];
+        choosedNodeData.selectedService.outputParam = [];
+    }
+    var inputGridStore =Ext.getCmp('inputParamsGrid').getStore();
+    for( var i = 0; i<inputGridStore.getTotalCount();i++ ){
+        var o = inputGridStore.getAt(i).data;
+        choosedNodeData.selectedService.inputParam.push({'name':o.name,'type':o.type,'value':o.value});
+    }
+    var outputGridStore =Ext.getCmp('outputParamsGrid').getStore();
+    for( var i = 0; i<outputGridStore.getTotalCount();i++ ){
+        var o = outputGridStore.getAt(i).data;
+        choosedNodeData.selectedService.outputParam.push({'name':o.name,'type':o.type,'value':o.value});
+    }
     _designer.model.updateTargetBindings(choosedNodeData) //更新节点数据
 }
 
@@ -544,52 +584,139 @@ function  test() {
     console.log('hello');
 }
 
-function saveBF(){
-    var params = {};
-    params.nodeDataArray = JSON.stringify(_designer.model.nodeDataArray);
-    params.linkDataArray = JSON.stringify(_designer.model.linkDataArray);//注意params.名称  名称与实体bean中名称一致
-    $.ajax({
-        type: "POST",
-        url: "../bussinessFlow/saveBF",
-        data: params,
-        dataType:"json",
-//	         		   contentType: "application/json; charset=utf-8",//此处不能设置，否则后台无法接值
-        success:function(data){
-            if(data.msg != ""){
-                alert( data.msg );
-            }
-        },
-        error:function(data){
-            alert("出现异常，异常原因【" + data + "】!");
+function saveCWSF(){
+    if(_designer.model.nodeDataArray == null){
+        alert('流程图没有节点');
+        return;
+    }
+    if(_designer.model.linkDataArray == null){
+        alert('流程图没有连线');
+        return;
+    }
+    var nodes = _designer.model.nodeDataArray;
+    var links = _designer.model.nodeDataArray;
+    var inputParams = [];
+    var inputParamsMap = {};
+    var outputParamsMap = {}
+    var errorMessage = '';
+    var startNode = 0;
+    var endNode = 0;
+    nodes.forEach(function (value, index) {
+        if(value.type == 'start'){
+            startNode ++;
         }
-    });
+        if(value.type == 'end'){
+            endNode ++;
+        }
+        if(value.type == 'operation') {
+            if(value.selectedService==null || value.selectedService.outputParam == null) {
+                errorMessage = value.text+'节点的输出参数为null';
+                return;
+            }
+            else {
+                value.selectedService.outputParam.forEach(function (value1) {
+                    var paramName = value1.value.split('[')[0];
+                    if(paramName == ""){
+                        errorMessage = value.text+'节点的输出参数'+value1.name+'name为空';
+                    }
+                    if (outputParamsMap[paramName] == null){
+                        outputParamsMap[paramName] = 'exists';
+                    }
+                })
+            }
+        }
+    })
+    nodes.forEach(function (value, index) {
+        if(value.type == 'operation') {
+            if(value.selectedService == null || value.selectedService.inputParam == null) {
+                errorMessage = value.text+'节点的输出参数为null';
+                return;
+            }
+            else {
+                value.selectedService.inputParam.forEach(function (value1) {
+                    var paramName = value1.value.split('[')[0];
+                    if(paramName == ""){
+                        errorMessage = value.text+'节点的输入参数'+value1.name+'name为空';
+                    }
+                    if (inputParamsMap[paramName] == null && outputParamsMap[paramName] == null){
+                        inputParamsMap[paramName] = 'exists';
+                        inputParams.push(value1)
+                    }
+                })
+            }
+        }
+    })
+    if(startNode == 0 ){
+        alert("缺少开始节点");
+        return;
+    }
+    if(startNode > 1){
+        alert("开始节点超过1个");
+        return;
+    }
+    if(endNode == 0 ){
+        alert("缺少结束节点");
+        return;
+    }
+    if(errorMessage != ''){
+        alert(errorMessage);
+        return;
+    }
+    else{
+        return inputParams;
+    }
+    // var params = {};
+//     params.nodeDataArray = JSON.stringify(_designer.model.nodeDataArray);
+//     params.linkDataArray = JSON.stringify(_designer.model.linkDataArray);//注意params.名称  名称与实体bean中名称一致
+//     $.ajax({
+//         type: "POST",
+//         url: "../bussinessFlow/saveCWSF",
+//         data: params,
+//         dataType:"json",
+// //	         		   contentType: "application/json; charset=utf-8",//此处不能设置，否则后台无法接值
+//         success:function(data){
+//             if(data.msg != ""){
+//                 alert( data.msg );
+//             }
+//         },
+//         error:function(data){
+//             alert("出现异常，异常原因【" + data + "】!");
+//         }
+//     });
 }
 
-function generateWSF(){
-    var params = {};
-    params.nodeDataArray = JSON.stringify(_designer.model.nodeDataArray);
-    params.linkDataArray = JSON.stringify(_designer.model.linkDataArray);//注意params.名称  名称与实体bean中名称一致
-    $.ajax({
-        type: "POST",
-        url: "../bussinessFlow/generateWSF",
-        data:params,
-        dataType:"json",
-        async:false,
-//	         		   contentType: "application/json; charset=utf-8",//此处不能设置，否则后台无法接值
-        success:function(data){
-            if(data.length !== 0){
-                localStorage.setItem("WSNodes",JSON.stringify(data));
-                localStorage.setItem("WSLinks",params.linkDataArray);
-                window.open("../views/combinedWSFlowChart.jsp");
-            }
-            else{
-                alert("无流程图数据");
-            }
-        },
-        error:function(data){
-            alert("出现异常，异常原因【" + data + "】!");
+function callWSF(){
+        var inputs = saveCWSF();
+        if(inputs !=null) {
+            localStorage.setItem('CWSinputParams', JSON.stringify(inputs));
+            localStorage.setItem("CWSNodes", JSON.stringify(_designer.model.nodeDataArray));
+            localStorage.setItem("CWSLinks", JSON.stringify(_designer.model.linkDataArray));
+            window.open("../views/callCombinedWS.jsp");
         }
-    });
+    // var params = {};
+    // params.nodeDataArray = JSON.stringify(_designer.model.nodeDataArray);
+    // params.linkDataArray = JSON.stringify(_designer.model.linkDataArray);//注意params.名称  名称与实体bean中名称一致
+//     $.ajax({
+//         type: "POST",
+//         url: "../bussinessFlow/callWSF",
+//         data:params,
+//         dataType:"json",
+//         async:false,
+// //	         		   contentType: "application/json; charset=utf-8",//此处不能设置，否则后台无法接值
+//         success:function(data){
+//             if(data.length !== 0){
+//                 localStorage.setItem("WSNodes",JSON.stringify(data));
+//                 localStorage.setItem("WSLinks",params.linkDataArray);
+//                 window.open("../views/combinedWSFlowChart.jsp");
+//             }
+//             else{
+//                 alert("无流程图数据");
+//             }
+//         },
+//         error:function(data){
+//             alert("出现异常，异常原因【" + data + "】!");
+//         }
+//     });
 }
 
 function loadParams(){
